@@ -1,0 +1,6 @@
+# AntiLootsteal Configuration
+# Time is in SECONDS.
+timeinseconds: 60
+message: '&cOnly the killer can pick that up for 1 minute.'
+messagefree: '&bAnyone can now pickup the loot from &6PLAYER'
+prefix: '&f[&4Lootsteal&f]'
