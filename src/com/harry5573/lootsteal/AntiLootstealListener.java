@@ -53,7 +53,7 @@ public class AntiLootstealListener implements Listener {
         i.setItemMeta(i1);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onLootstealDeath(PlayerDeathEvent e) {
         final Player killer = e.getEntity().getKiller();
         final Player killed = e.getEntity();
@@ -115,7 +115,7 @@ public class AntiLootstealListener implements Listener {
 
         String player = getValueFromLore(lore, "Killer:");
 
-        if (System.currentTimeMillis() >= timenew) {
+        if (System.currentTimeMillis() > timenew) {
             this.removeItemAndLorePlayer(player, item, String.valueOf(time));
             return;
         }
