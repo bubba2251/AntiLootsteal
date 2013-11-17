@@ -59,6 +59,20 @@ public class AntiLootstealUtil {
     }
 
     /**
+     * AntiSpam
+     */
+    public void antiSpam(final Player p) {
+        plugin.spamProt.add(p);
+        
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                plugin.spamProt.remove(p);
+            }
+        }, plugin.getConfig().getInt("timeantispam") * 20);
+    }
+
+    /**
      * Returns a value from an items lore
      *
      * @param par1

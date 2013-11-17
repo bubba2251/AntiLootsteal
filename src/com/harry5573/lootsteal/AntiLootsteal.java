@@ -14,7 +14,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.lootsteal;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -29,6 +32,10 @@ public class AntiLootsteal extends JavaPlugin {
      */
     public AntiLootstealUtil util;
     
+    /**
+     * AntiSpam
+     */
+    public List<Player>spamProt = new ArrayList<>();
     
     @Override
     public void onEnable() {

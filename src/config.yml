@@ -1,6 +1,16 @@
-# AntiLootsteal Configuration
-# Time is in SECONDS.
-timeinseconds: 60
-message: '&cOnly the killer can pick that up for 1 minute.'
-messagefree: '&bAnyone can now pickup the loot from &6PLAYER'
+# AntiLootsteal By Harry5573 Configuration
+#
+# Prefix to use before/after messages
 prefix: '&f[&4Lootsteal&f]'
+#
+# Time in seconds before anyone can pick the loot up
+timeinseconds: 60
+#
+# The message when someone whos not the killer trys to pick up loot from someone and its still protected
+message: '&cOnly &eKILLER &ccan pick that up for 1 minute.'
+#
+# Message to send to the killer after X time
+messagefree: '&bAnyone can now pickup the loot from &6PLAYER'
+#
+# How often should we message a player when they stand on a pile of protected loot?
+timeantispam: 5

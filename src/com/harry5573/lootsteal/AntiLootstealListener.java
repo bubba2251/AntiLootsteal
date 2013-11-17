@@ -18,6 +18,7 @@ package com.harry5573.lootsteal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,7 +41,7 @@ public class AntiLootstealListener implements Listener {
         this.plugin = instance;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onLootstealDeath(PlayerDeathEvent e) {
         final Player killer = e.getEntity().getKiller();
         final Player killed = e.getEntity();
@@ -54,26 +55,26 @@ public class AntiLootstealListener implements Listener {
                     for (String s : meta.getLore()) {
                         lore.add(s);
                     }
+                }
 
                     lore.add("Time: " + System.currentTimeMillis());
                     lore.add("Killed Item");
                     lore.add("Killer: " + killer.getName());
                     meta.setLore(lore);
                     item.setItemMeta(meta);
-                }
             }
             plugin.util.cooldown(killer, killed);
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLootstealPickup(PlayerPickupItemEvent e) {
         Player p = e.getPlayer();
 
         ItemStack item = e.getItem().getItemStack();
 
         ItemMeta meta = item.getItemMeta();
-
+        
         if (meta != null) {
             if (meta.hasLore()) {
                 List<String> lore = meta.getLore();
@@ -82,7 +83,7 @@ public class AntiLootstealListener implements Listener {
 
                     long time = Long.valueOf(plugin.util.getValueFromLore(lore, "Time:"));
                     long timenew = time + TimeUnit.SECONDS.toMillis(plugin.getConfig().getInt("timeinseconds"));
-
+                    
                     String player = plugin.util.getValueFromLore(lore, "Killer:");
 
                     if (lore.contains("Killer: " + p.getName())) {
@@ -96,7 +97,10 @@ public class AntiLootstealListener implements Listener {
                     }
                     e.setCancelled(true);
 
-                    p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("message")));
+                    if (!plugin.spamProt.contains(p)) {
+                        p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("message")).replaceAll("KILLER", player));
+                        plugin.util.antiSpam(p);
+                    }
                 }
             }
         }
