@@ -14,6 +14,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.lootsteal;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -23,8 +24,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AntiLootsteal extends JavaPlugin {
 
     public static AntiLootsteal plugin;
-    public AntiLootstealListener il;
-
+    /**
+     * Needed classes
+     */
+    public AntiLootstealUtil util;
+    
+    
     @Override
     public void onEnable() {
         plugin = this;
@@ -33,9 +38,10 @@ public class AntiLootsteal extends JavaPlugin {
         log("Anti Lootsteal version " + getDescription().getVersion() + " by Harry5573 starting...");
 
         this.saveDefaultConfig();
-        this.il = new AntiLootstealListener(this);
+        
+        this.util = new AntiLootstealUtil(this);
 
-        getServer().getPluginManager().registerEvents(new AntiLootstealListener(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AntiLootstealListener(this), this);
         
         this.getCommand("lootsteal").setExecutor(new AntiLootstealCommand(this));
         log("================================");

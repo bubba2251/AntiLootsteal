@@ -42,33 +42,32 @@ public class AntiLootstealCommand implements CommandExecutor {
             p = (Player) sender;
         }
 
-
         if (commandLabel.equalsIgnoreCase("lootsteal")) {
 
             if (p == null) {
                 plugin.log("That is not a console command");
                 return true;
             }
-            
+
             if (!p.hasPermission("lootsteal.admin")) {
-                p.sendMessage(plugin.getConfig().getString("prefix").replaceAll("(&([a-f0-9]))", "\u00A7$2") + ChatColor.RED + " Permission denied!");
+                p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("prefix")) + ChatColor.RED + " Permission denied!");
                 return true;
             }
 
             if (args.length != 1) {
-                p.sendMessage(plugin.getConfig().getString("prefix").replaceAll("(&([a-f0-9]))", "\u00A7$2") + ChatColor.RED + " Usage: /lootsteal <reload>");
+                p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("prefix")) + ChatColor.RED + " Usage: /lootsteal <reload>");
                 return true;
             }
 
             if (args.length == 1) {
 
                 if (args[0].equalsIgnoreCase("reload")) {
-                    p.sendMessage(plugin.getConfig().getString("prefix").replaceAll("(&([a-f0-9]))", "\u00A7$2") + ChatColor.GREEN + " Configuration Has Been Reloaded!");
+                    p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("prefix")) + ChatColor.GREEN + " Configuration Has Been Reloaded!");
                     plugin.reloadConfig();
                     return true;
                 }
 
-                p.sendMessage(plugin.getConfig().getString("prefix").replaceAll("(&([a-f0-9]))", "\u00A7$2") + ChatColor.RED + " Usage: /lootsteal <reload>");
+                p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("prefix")) + ChatColor.RED + " Usage: /lootsteal <reload>");
             }
         }
         return false;

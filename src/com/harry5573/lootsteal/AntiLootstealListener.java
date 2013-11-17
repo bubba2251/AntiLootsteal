@@ -18,8 +18,6 @@ package com.harry5573.lootsteal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,138 +39,90 @@ public class AntiLootstealListener implements Listener {
     public AntiLootstealListener(AntiLootsteal instance) {
         this.plugin = instance;
     }
-    
 
-    public void removeItemAndLorePlayer(String player, ItemStack i, String time) {
-        ItemMeta i1 = i.getItemMeta();
-        List<String> lore1 = i1.getLore();
-        lore1.remove("Killed Item");
-        lore1.remove("Killer: " + player);
-        lore1.remove("Time: " + time);
-        i1.setLore(lore1);
-        i.setItemMeta(i1);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onLootstealDeath(PlayerDeathEvent e) {
         final Player killer = e.getEntity().getKiller();
         final Player killed = e.getEntity();
-        
-        if (killer == null) {
-            return;
-        }
+        List<String> lore = new ArrayList<>();
 
-        for (ItemStack i : e.getDrops()) {
-            ItemMeta i1 = i.getItemMeta();
+        if (killer != null) {
+            for (ItemStack item : e.getDrops()) {
+                ItemMeta meta = item.getItemMeta();
 
-            if (i1.hasLore()) {
-                List<String> lore = i1.getLore();
-                
-                lore.add("Killed Item");
-                lore.add("Killer: " + killer.getName());
-                i1.setLore(lore);
-                i.setItemMeta(i1);
-            } else if (!i1.hasLore()) {
-                List<String> lore1 = new ArrayList<>();
-                
-                lore1.add("Time: " + System.currentTimeMillis());
-                lore1.add("Killed Item");
-                lore1.add("Killer: " + killer.getName());
-                i1.setLore(lore1);
-                i.setItemMeta(i1);
+                if (meta.hasLore()) {
+                    for (String s : meta.getLore()) {
+                        lore.add(s);
+                    }
+
+                    lore.add("Time: " + System.currentTimeMillis());
+                    lore.add("Killed Item");
+                    lore.add("Killer: " + killer.getName());
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+                }
             }
+            plugin.util.cooldown(killer, killed);
         }
-
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                String newmsg = plugin.getConfig().getString("messagefree").replaceAll("(&([a-f0-9]))", "\u00A7$2").replaceAll("PLAYER", killed.getName());
-                killer.sendMessage(newmsg);
-            }
-        }, plugin.getConfig().getInt("timeinseconds") * 20);
-
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
     public void onLootstealPickup(PlayerPickupItemEvent e) {
-        final Player p = e.getPlayer();
+        Player p = e.getPlayer();
 
         ItemStack item = e.getItem().getItemStack();
+
         ItemMeta meta = item.getItemMeta();
 
-        if (!meta.hasLore()) {
-            return;
-        }
+        if (meta != null) {
+            if (meta.hasLore()) {
+                List<String> lore = meta.getLore();
 
-        List<String> lore = meta.getLore();
+                if (lore.contains("Killed Item")) {
 
-        if (!lore.contains("Killed Item")) {
-            return;
-        }
+                    long time = Long.valueOf(plugin.util.getValueFromLore(lore, "Time:"));
+                    long timenew = time + TimeUnit.SECONDS.toMillis(plugin.getConfig().getInt("timeinseconds"));
 
-        long time = Long.valueOf(this.getValueFromLore(lore, "Time:"));
-        long timenew = time + TimeUnit.SECONDS.toMillis(plugin.getConfig().getInt("timeinseconds"));
+                    String player = plugin.util.getValueFromLore(lore, "Killer:");
 
-        String player = getValueFromLore(lore, "Killer:");
-
-        if (System.currentTimeMillis() > timenew) {
-            this.removeItemAndLorePlayer(player, item, String.valueOf(time));
-            return;
-        }
-
-        if (lore.contains("Killer: " + p.getName())) {
-            this.removeItemAndLorePlayer(p.getName(), item, String.valueOf(time));
-            return;
-        }
-        
-        e.setCancelled(true);
-
-        p.sendMessage(plugin.getConfig().getString("message").replaceAll("(&([a-f0-9]))", "\u00A7$2"));
-    }
-
-    public String getValueFromLore(List<String> par1, String par2) {
-        String retString = "";
-        try {
-            if (par1 != null) {
-                for (int i = 0; i < par1.size(); i++) {
-                    if (par1.get(i).contains(par2)) {
-                        retString = cleanUpLore(par1.get(i));
-                        return retString;
+                    if (lore.contains("Killer: " + p.getName())) {
+                        plugin.util.cleanItemLore(p.getName(), item, String.valueOf(time));
+                        return;
                     }
+
+                    if (System.currentTimeMillis() > timenew) {
+                        plugin.util.cleanItemLore(player, item, String.valueOf(time));
+                        return;
+                    }
+                    e.setCancelled(true);
+
+                    p.sendMessage(plugin.util.translateToColorCode(plugin.getConfig().getString("message")));
                 }
-            } else {
-                return retString;
             }
-        } catch (Exception e) {
         }
-        return retString;
     }
 
-    private static String cleanUpLore(String par1) {
-        String[] arg = par1.split(":");
-        arg[1] = ChatColor.stripColor(arg[1]);
-        String str = arg[1].replace("%", "").trim().toString();
-        return str;
-    }
-
+    /**
+     * If a hopper trys to pick it up
+     *
+     * @param e
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHopperPickup(InventoryPickupItemEvent e) {
         ItemStack item = e.getItem().getItemStack();
 
         ItemMeta meta = item.getItemMeta();
-        
-        if (!meta.hasLore()) {
-            return;
+        if (meta != null) {
+            if (meta.hasLore()) {
+                List<String> lore = meta.getLore();
+
+                if (lore.contains("Killed Item")) {
+                    long time = Long.valueOf(plugin.util.getValueFromLore(lore, "Time:"));
+                    String player = plugin.util.getValueFromLore(lore, "Killer:");
+
+                    plugin.util.cleanItemLore(player, item, String.valueOf(time));
+                }
+            }
         }
-        
-        List<String> lore = meta.getLore();
-        
-        if (!lore.contains("Killed Item")) {
-            return;
-        }
-        long time = Long.valueOf(this.getValueFromLore(lore, "Time:"));
-        String player = getValueFromLore(lore, "Killer:");
-        
-        this.removeItemAndLorePlayer(player, item, String.valueOf(time));
     }
 }
