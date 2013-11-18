@@ -73,51 +73,15 @@ public class AntiLootstealUtil {
     }
 
     /**
-     * Returns a value from an items lore
-     *
-     * @param par1
-     * @param par2
-     * @return
-     */
-    public String getValueFromLore(List<String> par1, String par2) {
-        String retString = "";
-        try {
-            if (par1 != null) {
-                for (int i = 0; i < par1.size(); i++) {
-                    if (par1.get(i).contains(par2)) {
-                        retString = cleanUpLore(par1.get(i));
-                        return retString;
-                    }
-                }
-            } else {
-                return retString;
-            }
-        } catch (Exception e) {
-        }
-        return retString;
-    }
-
-    private static String cleanUpLore(String par1) {
-        String[] arg = par1.split(":");
-        arg[1] = ChatColor.stripColor(arg[1]);
-        String str = arg[1].replace("%", "").trim().toString();
-        return str;
-    }
-    
-    /**
      * Cleans the item lore from our methods
      *
-     * @param player
-     * @param i
-     * @param time
      */
-    public void cleanItemLore(String player, ItemStack i, String time) {
-        ItemMeta i1 = i.getItemMeta();
-        List<String> lore1 = i1.getLore();
-        lore1.remove("Killed Item");
-        lore1.remove("Killer: " + player);
-        lore1.remove("Time: " + time);
-        i1.setLore(lore1);
-        i.setItemMeta(i1);
+    public void cleanItemLore(ItemStack item, List<String> remove) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore = meta.getLore();
+        for (String s : remove) {
+            lore.remove(s);
+        }
+
     }
 }
