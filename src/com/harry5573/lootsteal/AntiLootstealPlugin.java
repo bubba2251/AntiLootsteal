@@ -14,29 +14,31 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package com.harry5573.lootsteal;
 
+import com.harry5573.lootsteal.commands.CmdLootsteal;
+import com.harry5573.lootsteal.listener.PlayerListener;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  *
  * @author Harry5573
  */
-public class AntiLootsteal extends JavaPlugin {
+public class AntiLootstealPlugin extends JavaPlugin {
 
-    public static AntiLootsteal plugin;
-    /**
-     * Needed classes
-     */
-    public AntiLootstealUtil util;
-    
+    public static AntiLootstealPlugin plugin;
+
     /**
      * AntiSpam
      */
-    public List<Player>spamProt = new ArrayList<>();
-    
+    public List<Player> spamProt = new ArrayList<>();
+
+    public static AntiLootstealPlugin get() {
+        return plugin;
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -45,12 +47,10 @@ public class AntiLootsteal extends JavaPlugin {
         log("Anti Lootsteal version " + getDescription().getVersion() + " by Harry5573 starting...");
 
         this.saveDefaultConfig();
-        
-        this.util = new AntiLootstealUtil(this);
 
-        Bukkit.getServer().getPluginManager().registerEvents(new AntiLootstealListener(this), this);
-        
-        this.getCommand("lootsteal").setExecutor(new AntiLootstealCommand(this));
+        registerEvents();
+
+        registerCommands();
         log("================================");
     }
 
@@ -61,5 +61,14 @@ public class AntiLootsteal extends JavaPlugin {
 
     public void log(String msg) {
         this.getLogger().info(msg);
+    }
+
+    private void registerEvents() {
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new PlayerListener(), this);
+    }
+
+    private void registerCommands() {
+        getCommand("lootsteal").setExecutor(new CmdLootsteal());
     }
 }

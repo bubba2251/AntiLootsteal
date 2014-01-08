@@ -2,7 +2,7 @@ name: AntiLootsteal
 authors: [Harry5573]
 website: www.harry5573.co.uk
 version: 1.0-A
-main: com.harry5573.lootsteal.AntiLootsteal
+main: com.harry5573.lootsteal.AntiLootstealPlugin
 commands:
   lootsteal:
     description: Main lootsteal command
